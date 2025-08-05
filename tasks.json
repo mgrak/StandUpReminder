@@ -1,0 +1,44 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "C/C++: cl.exe build StandReminder",
+            "type": "shell",
+            "command": "cl.exe",
+            "args": [
+                "/Zi",
+                "/EHsc",
+                "/nologo",
+                "/Fe${fileDirname}\\StandReminder.exe",
+                "${fileDirname}\\StandReminder.cpp",
+                "${fileDirname}\\StandReminder.res", // Link the resource file
+                "/link",
+                "/SUBSYSTEM:WINDOWS", // Specify Windows subsystem
+                "User32.lib",
+                "Shell32.lib" // Add Shell32.lib for Shell_NotifyIcon
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": ["rc.exe build"]
+        },
+        {
+            "label": "rc.exe build",
+            "type": "shell",
+            "command": "rc.exe",
+            "args": [
+                "/fo",
+                "${fileDirname}\\StandReminder.res",
+                "${fileDirname}\\StandReminder.rc"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
