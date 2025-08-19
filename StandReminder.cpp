@@ -23,6 +23,8 @@ void AddTrayIcon(HWND hwnd);
 void RemoveTrayIcon(HWND hwnd);
 void ShowContextMenu(HWND hwnd);
 void showReminder();
+void showSitDownReminder();
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     // Hide console if it's somehow allocated
@@ -72,13 +74,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
                 struct tm localTime;
                 localtime_s(&localTime, &currentTime);
 
-                // Check if it's on the hour between 7 AM (7) and 5 PM (17)
-                if (localTime.tm_hour >= 7 && localTime.tm_hour <= 17 && localTime.tm_min == 0 && localTime.tm_sec == 0) {
-                    showReminder();
+                // Check if within the valid hour range and the second is 0
+                if (localTime.tm_hour >= 7 && localTime.tm_hour <= 17 && localTime.tm_sec == 0) {
+                    // Check if it's on the hour for the stand-up reminder
+                    if (localTime.tm_min == 0) {
+                        showReminder();
+                    }
+                    // Check if it's 20 minutes past the hour for the sit-down reminder
+                    else if (localTime.tm_min == 20) {
+                        showSitDownReminder();
+                    }
                 }
             }
             return 0;
-
         case WM_TRAYICON:
             if (lParam == WM_RBUTTONUP) {
                 ShowContextMenu(hwnd);
@@ -132,4 +140,9 @@ void ShowContextMenu(HWND hwnd) {
 void showReminder() {
     PlaySound(TEXT("C:\\Windows\\Media\\tada.wav"), NULL, SND_FILENAME | SND_ASYNC);
     MessageBox(NULL, TEXT("It's the top of the hour! Time to stretch or take a short break."), TEXT("Hourly Reminder"), MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+}
+
+void showSitDownReminder() {
+    PlaySound(TEXT("C:\\Windows\\Media\\Speech Sleep.wav"), NULL, SND_FILENAME | SND_ASYNC);
+    MessageBox(NULL, TEXT("20 minutes have passed. Time to sit back down."), TEXT("Sit Down Reminder"), MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
 }
